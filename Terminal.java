@@ -1,6 +1,7 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Paths;
+import java.util.*;
+
 public class Terminal {
 
     private Parser parser;
@@ -40,6 +41,18 @@ public class Terminal {
 
             case"cd":
                 cd(args);
+                break;
+
+            case"ls":
+                LS();
+                break;
+
+            case"ls-r":
+                LSR();
+                break;
+
+            case"rm":
+                RM();
                 break;
 
             case"history":
@@ -104,6 +117,31 @@ public class Terminal {
         }
     }
 
+    public void LS(){
+//       currentDirectory= Paths.get("").toAbsolutePath().toString();
+        File directory = new File(currentDirectory);
+        String files[] = directory.list();
+        Arrays.sort(files);
+        for (int i = 0 ; i<files.length ; i++){
+            System.out.println(files[i]);
+        }
+    }
+    public void LSR(){
+//        currentDirectory= Paths.get("").toAbsolutePath().toString();
+        File directory = new File(currentDirectory);
+        String files[] = directory.list();
+        Arrays.sort(files, Collections.reverseOrder());
+        for (int i = 0 ; i<files.length ; i++){
+            System.out.println(files[i]);
+        }
+    }
+
+    public void RM(){
+        Scanner obj = new Scanner(System.in);
+        String name=obj.nextLine();
+        File file = new File(name);
+        file.delete();
+    }
     public void history(){
         int index = 1;
         for(String command : commandHistory){
