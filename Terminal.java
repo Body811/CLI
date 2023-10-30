@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class Terminal {
         parser.parse(input);
     }
 
-    public void chooseCommandAction(){
+    public void chooseCommandAction() throws Exception{
         //calls the correct function based on the command name
         String commandName = parser.getCommandName();
         String[] args = parser.getArgs();
@@ -59,6 +59,15 @@ public class Terminal {
                 history();
                 break;
 
+            case"touch":
+                touch(args);
+                break;
+            case"cat":
+                cat(args);
+                break;
+            case"wc":
+                wc(args);
+                break;
             // Add implemented functions' switch cases
 
             case"exit":
@@ -149,4 +158,63 @@ public class Terminal {
             index++;
         }
     }
+
+    public void touch(String[] args){
+        File file = new File(args[0]);
+        try {
+            file.createNewFile();
+        }
+        catch (IOException e){
+        }
+    }
+
+    public void cat(String[] args){
+        try {
+            File file=new File(args[0]);
+            FileInputStream fis=new FileInputStream(file);
+            int r=0;
+            while((r=fis.read())!=-1) {
+                System.out.print((char)r);
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }System.out.print('\n');
+        if (args.length==2) {
+            try {
+                File file=new File(args[1]);
+                FileInputStream fis=new FileInputStream(file);
+                int r=0;
+                while((r=fis.read())!=-1) {
+                    System.out.print((char)r);
+                }
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+            System.out.print('\n');
+        }
+    }
+
+    public void wc(String[] args) throws IOException {
+        int charCount = 0, wordCount = 0,lineCount = 0;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+            String currentLine = reader.readLine();
+            while (currentLine != null) {
+                lineCount++;
+                String[] words = currentLine.split(" ");
+                wordCount = wordCount + words.length;
+                for (String word : words) {
+                    charCount = charCount + word.length();
+                }
+                currentLine = reader.readLine();
+            }
+            System.out.println(lineCount+" "+wordCount+" "+charCount+" "+args[0]);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
 }
