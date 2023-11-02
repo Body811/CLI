@@ -68,6 +68,15 @@ public class Terminal {
             case"wc":
                 wc(args);
                 break;
+            case"mkdir":
+                mkdir(args);
+                break;
+            case"rmdir":
+                rmdir(args);
+                break;
+            case"cp":
+                cp(args);
+                break;
             // Add implemented functions' switch cases
 
             case"exit":
@@ -145,6 +154,7 @@ public class Terminal {
         }
     }
 
+
     public void RM(){
         Scanner obj = new Scanner(System.in);
         String name=obj.nextLine();
@@ -214,6 +224,130 @@ public class Terminal {
         }
         catch (IOException e){
             e.printStackTrace();
+        }
+    }
+
+    public void mkdir(String[] args) {
+        if (args.length > 0) {
+            for (String arg : args) {
+                createDirectory(arg);
+            }
+        } else {
+            System.out.println("Error: Missing directory names in mkdir command.");
+        }
+    }
+
+    private void createDirectory(String dirPath) {
+        File newDir;
+
+        if (dirPath.endsWith(File.separator)) {
+            dirPath = dirPath.substring(0, dirPath.length() - 1);
+        }
+
+        if (dirPath.contains(File.separator)) {
+            newDir = new File(dirPath);
+        } else {
+            newDir = new File(currentDirectory + File.separator + dirPath);
+        }
+
+        if (newDir.exists()) {
+            System.out.println("Directory already exists: " + newDir.getAbsolutePath());
+        } else {
+            newDir.mkdir();
+        }
+    }
+
+
+    public void rmdir(String[] args) {
+        if (args.length == 1) {
+            if (args[0].equals("*")) {
+                removeEmptyDirectoriesInCurrentDirectory(currentDirectory);
+            } else {
+                String directoryPath = args[0];
+                if (directoryPath.startsWith("/")) {
+                    // Handle full path
+                    removeEmptyDirectory(directoryPath);
+                } else {
+                    // Handle relative (short) path
+                    String fullPath = currentDirectory + File.separator + directoryPath;
+                    removeEmptyDirectory(fullPath);
+                }
+            }
+        } else {
+            System.out.println("Error: Invalid number of arguments for rmdir");
+        }
+    }
+
+    private void removeEmptyDirectoriesInCurrentDirectory(String directoryPath) {
+        File currentDir = new File(directoryPath);
+        if (currentDir.exists() && currentDir.isDirectory()) {
+            File[] subdirs = currentDir.listFiles();
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.isDirectory() && subdir.list().length == 0) {
+                        if (subdir.delete()) {
+                            System.out.println("Removed directory: " + subdir.getAbsolutePath());
+                        } else {
+                            System.out.println("Failed to remove directory: " + subdir.getAbsolutePath());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void removeEmptyDirectory(String directoryPath) {
+        File dir = new File(directoryPath);
+        if (dir.exists() && dir.isDirectory()) {
+            if (dir.list().length == 0) {
+                if (dir.delete()) {
+                    System.out.println("Removed directory: " + dir.getAbsolutePath());
+                } else {
+                    System.out.println("Failed to remove directory: " + dir.getAbsolutePath());
+                }
+            } else {
+                System.out.println("Error: The directory is not empty and cannot be removed.");
+            }
+        } else {
+            System.out.println("Error: Directory not found: " + directoryPath);
+        }
+    }
+
+    public void cp(String[] args) {
+        if (args.length != 2) {
+            System.out.println("Error: cp command requires exactly two arguments.");
+            return;
+        }
+
+        String sourceFilePath = args[0];
+        String destinationFilePath = args[1];
+
+        try {
+            File sourceFile = new File(sourceFilePath);
+            File destinationFile = new File(destinationFilePath);
+
+            if (!sourceFile.exists()) {
+                System.out.println("Error: Source file does not exist.");
+            } else if (destinationFile.exists() && !destinationFile.isFile()) {
+                System.out.println("Error: Destination is not a valid file.");
+            } else {
+                copyFile(sourceFile, destinationFile);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: An error occurred while copying the file.");
+            e.printStackTrace();
+        }
+    }
+
+    private void copyFile(File source, File destination) throws IOException {
+        try (InputStream inStream = new FileInputStream(source);
+             OutputStream outStream = new FileOutputStream(destination)) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inStream.read(buffer)) > 0) {
+                outStream.write(buffer, 0, length);
+            }
         }
     }
 
