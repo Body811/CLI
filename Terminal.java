@@ -77,8 +77,6 @@ public class Terminal {
             case"cp":
                 cp(args);
                 break;
-            // Add implemented functions' switch cases
-
             case"exit":
                 System.exit(0);
                 break;
@@ -108,22 +106,19 @@ public class Terminal {
             if (args.length > 0) {
                 if (args[0].equals("..")) {
                     File parentDir = new File(currentDirectory).getParentFile();
-                    if(parentDir!= null){
+                    if(parentDir.isDirectory){
                         currentDirectory = parentDir.getAbsolutePath();
                     }
                 } else{
-                    File[] roots = File.listRoots();
-                    for (File file: roots) {
-                        if (args[0].startsWith(file.toString())) {
-                            File newDir = new File(args[0]);
-                            if (newDir != null){
-                                currentDirectory = newDir.getAbsolutePath();
-                            }
-                        }else{
-                            File newDir = new File(currentDirectory+File.separator+args[0]);
-                            if(newDir != null){
-                                currentDirectory = newDir.getAbsolutePath();
-                            }
+                    if (args[0].contains(":")) {
+                        File newDir = new File(args[0]);
+                        if (newDir.isDirectory()){
+                            currentDirectory = newDir.getAbsolutePath();
+                        }
+                    }else{
+                        File newDir = new File(currentDirectory+File.separator+args[0]);
+                        if(newDir.isDirectory()){
+                            currentDirectory = newDir.getAbsolutePath();
                         }
                     }
                 }

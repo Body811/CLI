@@ -6,7 +6,7 @@ public class Main {
             Scanner obj =new Scanner(System.in);
             Terminal t = new Terminal();
             while(true){
-                System.out.println(t.getCurrentDirectory()+"> ");
+                System.out.print(t.getCurrentDirectory()+"> ");
                 String input =obj.nextLine();
                 t.parse(input);
                 t.chooseCommandAction();
